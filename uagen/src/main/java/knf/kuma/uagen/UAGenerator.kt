@@ -1,9 +1,66 @@
 package knf.kuma.uagen
 
+import com.terryhuanghd.useragency.UserAgency
+import com.terryhuanghd.useragency.UserApp.*
+import com.terryhuanghd.useragency.UserDevice.*
+import org.nield.kotlinstatistics.WeightedDice
+import org.nield.kotlinstatistics.weightedCoinFlip
 import java.util.*
 import kotlin.math.floor
 
 fun randomUA() = UAGenerator.getRandomUserAgent()
+fun randomPhoneUA() = if (weightedCoinFlip(50.0)) randomAndroidUA() else randomIPhoneUA()
+fun randomPCUA() = if (weightedCoinFlip(50.0)) randomWindowsUA() else randomMacUA()
+
+fun randomAndroidUA(): String {
+    val app = WeightedDice(
+        Chrome() to 52.9,
+        Firefox() to 28.2,
+        Edge() to 18.9
+    ).roll()
+    val device = if (weightedCoinFlip(50.0)) {
+        AndroidPhone()
+    } else {
+        AndroidPad()
+    }
+    return UserAgency().setApp(app).setDevice(device).string
+}
+
+fun randomIPhoneUA(): String {
+    val app = WeightedDice(
+        Chrome() to 52.9,
+        Firefox() to 28.2,
+        Safari() to 3.9,
+        Edge() to 1.8
+    ).roll()
+    val device = if (weightedCoinFlip(50.0)) {
+        iPhone()
+    } else {
+        iPad()
+    }
+    return UserAgency().setApp(app).setDevice(device).string
+}
+
+fun randomMacUA(): String {
+    val app = WeightedDice(
+        Chrome() to 52.9,
+        Firefox() to 28.2,
+        Safari() to 3.9,
+        Edge() to 1.8
+    ).roll()
+    return UserAgency().setApp(app).setDevice(Mac()).string
+}
+
+fun randomWindowsUA(): String {
+    val app = WeightedDice(
+        Chrome() to 52.9,
+        Firefox() to 28.2,
+        IE() to 1.8,
+        Edge() to 3.9
+    ).roll()
+    return UserAgency().setApp(app).setDevice(WindowsPC()).string
+}
+
 
 object UAGenerator {
     private val uaMap = HashMap<String, Array<String>>()
