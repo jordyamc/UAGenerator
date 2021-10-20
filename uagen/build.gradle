@@ -41,7 +41,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'knf.tools'
                 artifactId = 'ua-generator'
-                version = '1.1'
+                version = '1.1.0'
                 //artifact bundleReleaseAar
             }
         }
