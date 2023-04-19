@@ -1,14 +1,19 @@
 package knf.kuma.uagen
 
+import android.webkit.WebSettings
 import com.terryhuanghd.useragency.UserAgency
 import com.terryhuanghd.useragency.UserApp.*
 import com.terryhuanghd.useragency.UserDevice.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
 import org.nield.kotlinstatistics.WeightedDice
 import org.nield.kotlinstatistics.weightedCoinFlip
 import java.util.*
 import kotlin.math.floor
 
 fun randomUA() = UAGenerator.getRandomUserAgent()
+suspend fun randomLatestUA() = UAGenerator.getLatestUserAgent()
 fun randomPhoneUA() = if (weightedCoinFlip(50.0)) randomAndroidUA() else randomIPhoneUA()
 fun randomPCUA() = if (weightedCoinFlip(50.0)) randomWindowsUA() else randomMacUA()
 
@@ -65,6 +70,7 @@ fun randomWindowsUA(): String {
 object UAGenerator {
     private val uaMap = HashMap<String, Array<String>>()
     private val freqMap = HashMap<String, Double>()
+    private val latestUA = mutableListOf<String>()
 
     init {
         freqMap["Internet Explorer"] = 11.8
@@ -2501,5 +2507,26 @@ object UAGenerator {
 
         val userAgents = uaMap[browser]?: arrayOf("")
         return userAgents[floor(Math.random() * userAgents.size).toInt()]
+    }
+
+    private suspend fun populateUA() {
+        withContext(Dispatchers.IO) {
+            val base = "https://www.whatismybrowser.com/guides/the-latest-user-agent"
+            latestUA.add(System.getProperty("http.agent"))
+            Jsoup.connect("$base/chrome").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
+            Jsoup.connect("$base/firefox").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
+            Jsoup.connect("$base/safari").get().select("span.code:contains(Macintosh)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
+            Jsoup.connect("$base/edge").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
+            Jsoup.connect("$base/opera").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
+            Jsoup.connect("$base/vivaldi").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
+            Jsoup.connect("$base/yandex-browser").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
+        }
+    }
+
+    suspend fun getLatestUserAgent(): String {
+        if (latestUA.isEmpty()) {
+            populateUA()
+        }
+        return latestUA.random()
     }
 }
