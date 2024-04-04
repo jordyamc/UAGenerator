@@ -20,6 +20,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility = '17'
+        targetCompatibility = '17'
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17
+    }
     namespace 'knf.kuma.uagen'
 
 }
