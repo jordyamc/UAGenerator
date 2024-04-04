@@ -1,15 +1,14 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
 
 
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
@@ -21,6 +20,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    namespace 'knf.kuma.uagen'
 
 }
 
@@ -29,8 +29,8 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
-    api 'com.github.TerryHuangHD:UserAgency-Android:0.3'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+    api 'com.github.jordyamc:UserAgency-Android:0.4'
     api 'org.nield:kotlin-statistics:1.2.1'
     api 'org.jsoup:jsoup:1.15.4'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -43,7 +43,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'knf.tools'
                 artifactId = 'ua-generator'
-                version = '1.2.0'
+                version = '1.2.1'
                 //artifact bundleReleaseAar
             }
         }

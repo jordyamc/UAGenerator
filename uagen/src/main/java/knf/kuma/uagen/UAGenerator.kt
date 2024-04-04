@@ -1,5 +1,6 @@
 package knf.kuma.uagen
 
+import android.util.Log
 import android.webkit.WebSettings
 import com.terryhuanghd.useragency.UserAgency
 import com.terryhuanghd.useragency.UserApp.*
@@ -65,8 +66,6 @@ fun randomWindowsUA(): String {
     ).roll()
     return UserAgency().setApp(app).setDevice(WindowsPC()).string
 }
-
-
 object UAGenerator {
     private val uaMap = HashMap<String, Array<String>>()
     private val freqMap = HashMap<String, Double>()
@@ -848,7 +847,6 @@ object UAGenerator {
             "Mozilla/1.22 (compatible; MSIE 2.0; Windows 95)",
             "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)"
         )
-
         uaMap["Firefox"] = arrayOf(
             "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0",
             "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20120101 Firefox/29.0",
@@ -2010,7 +2008,6 @@ object UAGenerator {
             "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/532.0 (KHTML, like Gecko) Chrome/4.0.211.4 Safari/532.0",
             "Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/532.0 (KHTML, like Gecko) Chrome/4.0.211.2 Safari/532.0"
         )
-
         uaMap["Safari"] = arrayOf(
             "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; it-it) AppleWebKit/419 (KHTML, like Gecko) Safari/419.3",
             "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; it-it) AppleWebKit/418.9 (KHTML, like Gecko) Safari/419.3",
@@ -2511,15 +2508,31 @@ object UAGenerator {
 
     private suspend fun populateUA() {
         withContext(Dispatchers.IO) {
-            val base = "https://www.whatismybrowser.com/guides/the-latest-user-agent"
-            latestUA.add(System.getProperty("http.agent"))
-            Jsoup.connect("$base/chrome").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
-            Jsoup.connect("$base/firefox").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
+            val base = "https://www.whatismybrowser.com/guides/the-latest-user-agent/windows"
+            System.getProperty("http.agent")?.let {
+                latestUA.add(it)
+            }
+            try {
+                Jsoup.connect(base).get().select("span.code").forEach {
+                    latestUA.add(it.text())
+                }
+            } catch (e:Exception) {
+                latestUA.addAll(
+                    listOf(
+                        uaMap.getValue("Internet Explorer").random(),
+                        uaMap.getValue("Firefox").random(),
+                        uaMap.getValue("Chrome").random(),
+                        uaMap.getValue("Safari").random(),
+                        uaMap.getValue("Opera").random()
+                    )
+                )
+            }
+            /*Jsoup.connect("$base/firefox").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
             Jsoup.connect("$base/safari").get().select("span.code:contains(Macintosh)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
             Jsoup.connect("$base/edge").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
             Jsoup.connect("$base/opera").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
             Jsoup.connect("$base/vivaldi").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
-            Jsoup.connect("$base/yandex-browser").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }
+            Jsoup.connect("$base/yandex-browser").get().select("span.code:contains(Win64)").first()?.text()?.ifBlank { null }?.also { latestUA.add(it) }*/
         }
     }
 

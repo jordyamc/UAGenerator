@@ -1,1 +1,3 @@
-include ':app', ':uagen'
+include ':uagen'
+if (!System.env.JITPACK)
+    include ':uatest'
